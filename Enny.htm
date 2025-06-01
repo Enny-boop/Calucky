@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #result { width: 300px; height: 40px; font-size: 20px; margin-bottom: 10px; text-align: right; }
+        button { width: 70px; height: 50px; font-size: 18px; margin: 5px; cursor: pointer; }
+        .memory { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Advanced Calculator</h1>
+    <input type="text" id="result" readonly>
+    <div>
+        <button onclick="appendToResult('7')">7</button>
+        <button onclick="appendToResult('8')">8</button>
+        <button onclick="appendToResult('9')">9</button>
+        <button onclick="appendToResult('+')">+</button>
+        <button onclick="appendToResult('^')">^</button>
+        <button class="memory" onclick="memoryAdd()">M+</button>
+    </div>
+    <div>
+        <button onclick="appendToResult('4')">4</button>
+        <button onclick="appendToResult('5')">5</button>
+        <button onclick="appendToResult('6')">6</button>
+        <button onclick="appendToResult('-')">-</button>
+        <button onclick="appendToResult('(')">(</button>
+        <button class="memory" onclick="memorySubtract()">M-</button>
+    </div>
+    <div>
+        <button onclick="appendToResult('1')">1</button>
+        <button onclick="appendToResult('2')">2</button>
+        <button onclick="appendToResult('3')">3</button>
+        <button onclick="appendToResult('*')">*</button>
+        <button onclick="appendToResult(')')">)</button>
+        <button class="memory" onclick="memoryRecall()">MR</button>
+    </div>
+    <div>
+        <button onclick="appendToResult('0')">0</button>
+        <button onclick="appendToResult('.')">.</button>
+        <button onclick="calculateResult()">=</button>
+        <button onclick="appendToResult('/')">/</button>
+        <button onclick="clearResult()">C</button>
+        <button class="memory" onclick="memoryClear()">MC</button>
+    </div>
+    <div>
+        <button onclick="calculateSqrt()">√</button>
+        <button onclick="calculateSquare()">x²</button>
+        <button onclick="calculateFactorial()">n!</button>
+        <button onclick="calculateLog()">log</button>
+        <button onclick="calculateSin()">sin</button>
+        <button onclick="calculateCos()">cos</button>
+        <button onclick="calculateTan()">tan</button>
+    </div>
+
+<script>
+let memory = 0;
+
+function appendToResult(value) {
+    document.getElementById('result').value += value;
+}
+
+function clearResult() {
+    document.getElementById('result').value = '';
+}
+
+function backspace() {
+    const resultField = document.getElementById('result');
+    resultField.value = resultField.value.slice(0, -1);
+}
+
+function calculateResult() {
+    const resultField = document.getElementById('result');
+    try {
+        let expr = resultField.value;
+
+        // Replace ^ with ** for exponentiation (eval supports **)
+        expr = expr.replace(/\^/g, '**');
+
+        // Handle percentage at the end (e.g., 50+20% = 50 + 10)
+        if (expr.includes('%')) {
+            const parts = expr.split('%');
+            if (parts.length > 1) {
+                const lastNum = parseFloat(parts[parts.length-2].match(/(\d+\.?\d*)$/)?.[0]);
+                if (!isNaN(lastNum)) {
+                    expr = expr.replace(/(\d+\.?\d*)%/, (match, num) => num + '*0.01');
+                }
+            }
+        }
+
+        // Evaluate the expression
+        const evaluatedValue = eval(expr);
+        if (isNaN(evaluatedValue) || !isFinite(evaluatedValue)) throw new Error("Invalid calculation");
+        resultField.value = evaluatedValue;
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateExponent() {
+    const resultField = document.getElementById('result');
+    const parts = resultField.value.split('^');
+    if (parts.length === 2) {
+        const base = parseFloat(parts[0]);
+        const exponent = parseFloat(parts[1]);
+        if (isNaN(base) || isNaN(exponent)) {
+            resultField.value = 'Error';
+            return;
+        }
+        resultField.value = Math.pow(base, exponent);
+    } else {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateLog() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value) || value <= 0) throw new Error("Invalid input");
+        resultField.value = Math.log10(value);
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateSin() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value)) throw new Error("Invalid input");
+        resultField.value = Math.sin(value * (Math.PI / 180)); // Convert to radians
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateCos() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value)) throw new Error("Invalid input");
+        resultField.value = Math.cos(value * (Math.PI / 180)); // Convert to radians
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateTan() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value)) throw new Error("Invalid input");
+        resultField.value = Math.tan(value * (Math.PI / 180)); // Convert to radians
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateSqrt() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value) || value < 0) throw new Error("Invalid input");
+        resultField.value = Math.sqrt(value);
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateSquare() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseFloat(resultField.value);
+        if (isNaN(value)) throw new Error("Invalid input");
+        resultField.value = value * value;
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function calculateFactorial() {
+    const resultField = document.getElementById('result');
+    try {
+        const value = parseInt(resultField.value);
+        if (isNaN(value) || value < 0) throw new Error("Invalid input");
+        let fact = 1;
+        for (let i = 2; i <= value; i++) fact *= i;
+        resultField.value = fact;
+    } catch (error) {
+        resultField.value = 'Error';
+    }
+}
+
+function memoryAdd() {
+    const resultField = document.getElementById('result');
+    const value = parseFloat(resultField.value);
+    if (!isNaN(value)) memory += value;
+}
+
+function memorySubtract() {
+    const resultField = document.getElementById('result');
+    const value = parseFloat(resultField.value);
+    if (!isNaN(value)) memory -= value;
+}
+
+function memoryRecall() {
+    document.getElementById('result').value = memory;
+}
+
+function memoryClear() {
+    memory = 0;
+}
+
+// Keyboard support
+document.addEventListener('keydown', function(event) {
+    const key = event.key;
+    if (!isNaN(key) || ['+', '-', '*', '/', '^', '(', ')', '.'].includes(key)) {
+        appendToResult(key);
+    } else if (key === 'Enter') {
+        calculateResult();
+    } else if (key === 'Backspace') {
+        backspace();
+    } else if (key === 'Escape') {
+        clearResult();
+    }
+});
+</script>
+</body>
+</html>
